@@ -1,4 +1,5 @@
 require "ropen"
+require "ropen/pipe"
 
 class Ropen::Command
   attr_reader :executable, :arguments
@@ -18,24 +19,14 @@ class Ropen::Command
       # child
       sub_pid = fork do
         # grandchild
-	@stdin_write.close
-	STDIN.reopen(@stdin_read)
-	@stdin_read
-        
-	@stdout_read.close
-	STDOUT.reopen(@stdout_write)
-	@stdout_write.close
-        
-	@stderr_read.close
-	STDERR.reopen(@stderr_write)
-	@stderr_write.close
-        
+        @stdin.bind_input(STDIN)
+        @stdout.bind_output(STDOUT)
+        @stderr.bind_output(STDERR)
 	exec(@executable, *@arguments)
       end
       Process.waitpid(sub_pid)
       exit!($?.exitstatus)
     end
-    # TODO: Wrap these bad boys in something comfortable.
     stdin, stdout, stderr = open_streams(pid)
     exit_status = $?.exitstatus
     yield stdin, stdout, stderr if block_given?
@@ -47,26 +38,22 @@ class Ropen::Command
 private
   
   def initialize_streams
-    @stdin_read,  @stdin_write  = IO::pipe
-    @stdout_read, @stdout_write = IO::pipe
-    @stderr_read, @stderr_write = IO::pipe
+    @stdin  = Ropen::Pipe.new
+    @stdout = Ropen::Pipe.new
+    @stderr = Ropen::Pipe.new
   end
   
   def open_streams(pid)
-    @stdin_read.close
-    @stdout_write.close
-    @stderr_write.close
+    @stdin.close_reader
+    @stdout.close_writer
+    @stderr.close_writer
     Process.waitpid(pid)
-    @stdin_write.sync = true
-    return [@stdin_write, @stdout_read, @stderr_read]
+    @stdin.writer.sync = true
+    return [@stdin.writer, @stdout.reader, @stderr.reader]
   end
   
   def finalize_streams
-    [
-      @stdin_read, @stdin_write,
-      @stdout_read, @stdout_write,
-      @stderr_read, @stderr_write
-    ].compact.each { |s| s.close unless s.closed? }
+    [@stdin, @stdout, @stderr].each { |s| s.close }
   end
   
 end
