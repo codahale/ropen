@@ -10,5 +10,5 @@ A process execution library which doesn't suck.
         end
         cmd.stdin.puts "cat doesn't take input, but imagine if it did..."
       end
-
+      cmd.run
 

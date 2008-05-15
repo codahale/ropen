@@ -1,8 +1,11 @@
 require "ropen"
 require "ropen/pipe"
+require "ropen/events"
+
+# TODO: document me
 
 class Ropen::Command
-  attr_reader :executable, :arguments, :exit_status
+  attr_reader :executable, :arguments, :exit_status, :stdin
   
   def initialize(executable, *arguments)
     @executable = File.expand_path(executable)
@@ -10,6 +13,8 @@ class Ropen::Command
     unless File.exist?(@executable)
       raise Ropen::InvalidExecutable.new("#{executable} does not exist")
     end
+    @stdout_events = Ropen::Events.new
+    @stderr_events = Ropen::Events.new
     yield self if block_given?
   end
   
@@ -28,10 +33,21 @@ class Ropen::Command
       exit!($?.exitstatus)
     end
     stdin, stdout, stderr = open_streams(pid)
+    @stdout_events.run(stdout)
+    @stderr_events.run(stderr)
     yield stdin, stdout, stderr if block_given?
+    [@stdout_events, @stderr_events].each { |e| e.finish }
     return @exit_status = $?
   ensure
     finalize_streams
+  end
+  
+  def stdout
+    @stdout_events
+  end
+  
+  def stderr
+    @stderr_events
   end
   
 private

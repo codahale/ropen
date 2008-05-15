@@ -51,11 +51,14 @@ describe Ropen::Command do
       @cmd.exit_status.should_not be(:success)
     end
     
-    it "should yield stdin, stdout, and stderr" do
-      @cmd.run do |stdin, stdout, stderr|
-        stdout.read.chomp.should == "This is stdout."
-        stderr.read.chomp.should == "This is stderr."
+    it "should call events placed on output streams" do
+      @cmd.stdout.on_output do |line|
+        line.should == "This is stdout.\n"
       end
+      @cmd.stderr.on_output do |line|
+        line.should == "This is stderr.\n"
+      end
+      @cmd.run
     end
     
   end
