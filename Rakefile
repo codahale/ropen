@@ -9,9 +9,6 @@ desc "Run all specs"
 Spec::Rake::SpecTask.new do |t|
   t.spec_files = FileList["spec/**/*_spec.rb"]
   t.spec_opts = ["-o", "spec/spec.opts"]
-  t.rcov = true
-  t.rcov_dir = 'doc/coverage'
-  t.rcov_opts = ['--exclude', 'spec\/spec,spec\/.*_spec.rb', "-T"]
 end
 
 CLOBBER.include(
@@ -23,6 +20,15 @@ namespace :spec do
   Spec::Rake::SpecTask.new('html') do |t|
     t.spec_files = FileList['spec/**/*_spec.rb']
     t.spec_opts = ['--diff','--format html','--backtrace','--out doc/specs.html']
+  end
+  
+  desc "Run all specs with rcov"
+  Spec::Rake::SpecTask.new("rcov") do |t|
+    t.spec_files = FileList["spec/**/*_spec.rb"]
+    t.spec_opts = ["-o", "spec/spec.opts"]
+    t.rcov = true
+    t.rcov_dir = 'doc/coverage'
+    t.rcov_opts = ['--exclude', 'spec\/spec,spec\/.*_spec.rb', "-T"]
   end
 end
 
