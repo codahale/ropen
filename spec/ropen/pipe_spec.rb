@@ -22,7 +22,7 @@ describe Ropen::Pipe do
     @pipe.reader.should_receive(:close)
     STDOUT.should_receive(:reopen).with(@pipe.writer)
     @pipe.writer.should_receive(:close)
-    @pipe.bind_output(STDOUT)
+    @pipe.bind_reader(STDOUT)
   end
   
   it "should bind a reader to a stream" do
@@ -30,7 +30,7 @@ describe Ropen::Pipe do
     STDIN.should_receive(:reopen).with(@pipe.reader)
     @pipe.reader.should_receive(:close)
     
-    @pipe.bind_input(STDIN)
+    @pipe.bind_writer(STDIN)
   end
   
   it "should close the reader" do

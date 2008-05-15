@@ -61,9 +61,9 @@ private
   end
   
   def redirect_streams
-    @stdin.bind_input(STDIN)
-    @stdout.bind_output(STDOUT)
-    @stderr.bind_output(STDERR)
+    @stdin.bind_writer(STDIN)
+    @stdout.bind_reader(STDOUT)
+    @stderr.bind_reader(STDERR)
   end
   
   def process_streams(stdin, stdout, stderr, child_pid)
