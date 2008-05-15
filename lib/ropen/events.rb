@@ -18,7 +18,7 @@ class Ropen::Events
   def run(stream)
     @thread = Thread.new do
       until stream.eof?
-        data = stream.read
+        data = stream.readpartial(1024)
         @callbacks.each do |e|
           @running_callbacks << Thread.new(data, &e)
         end

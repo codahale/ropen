@@ -29,7 +29,7 @@ describe Ropen::Events do
   
   it "should run collected events in parallel" do
     @stream.should_receive(:eof?).and_return(false, false, true)
-    @stream.should_receive(:read).and_return("blah", "blee")
+    @stream.should_receive(:readpartial).with(an_instance_of(Numeric)).and_return("blah", "blee")
     
     @events.on_output do |line|
       ThreadSafeStorage.instance.stuff << [1, line]

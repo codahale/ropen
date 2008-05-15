@@ -7,6 +7,7 @@ describe Ropen::Command do
   before(:each) do
     @prints_stdout = fixture(:prints_stdout)
     @exits_with_error  = fixture(:exits_with_error)
+    @asks_for_name = fixture(:asks_for_name)
   end
   
   describe "initializing" do
@@ -59,6 +60,31 @@ describe Ropen::Command do
         line.should == "This is stderr.\n"
       end
       @cmd.run
+    end
+    
+  end
+  
+  describe "running an executable which requires input" do
+    
+    before(:each) do
+      @cmd = Ropen::Command.new(@asks_for_name)
+    end
+    
+    it "should allow data to be written on stdin" do
+      @cmd.stdout.on_output do |line|
+        line.should == "You entered: MONGO\n"
+      end
+      @cmd.stderr.on_output do |line|
+        if line =~ /Enter your name/
+          @cmd.stdin.puts "MONGO"
+          @cmd.stdin.flush
+        end
+      end
+      @cmd.run
+    end
+    
+    it "should timeout after a specified period of waiting for input" do
+      
     end
     
   end

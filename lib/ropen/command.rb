@@ -5,7 +5,7 @@ require "ropen/events"
 # TODO: document me
 
 class Ropen::Command
-  attr_reader :executable, :arguments, :exit_status, :stdin
+  attr_reader :executable, :arguments, :exit_status
   
   def initialize(executable, *arguments)
     @executable = File.expand_path(executable)
@@ -29,17 +29,23 @@ class Ropen::Command
         @stderr.bind_output(STDERR)
 	exec(@executable, *@arguments)
       end
-      Process.waitpid(sub_pid)
-      exit!($?.exitstatus)
+      # TODO: figure out how to pass sub_pid upstream to the grandparent process
+      exit(0)
+#      Process.waitpid(sub_pid)
+#      exit($?.exitstatus)
     end
     stdin, stdout, stderr = open_streams(pid)
+    @stdin_io = stdin
     @stdout_events.run(stdout)
     @stderr_events.run(stderr)
-    yield stdin, stdout, stderr if block_given?
     [@stdout_events, @stderr_events].each { |e| e.finish }
     return @exit_status = $?
   ensure
     finalize_streams
+  end
+  
+  def stdin
+    @stdin_io
   end
   
   def stdout
@@ -69,6 +75,10 @@ private
   
   def finalize_streams
     [@stdin, @stdout, @stderr].each { |s| s.close }
+    @stdin = nil
+    @stdin_io = nil
+    @stdout = nil
+    @stderr = nil
   end
   
 end
