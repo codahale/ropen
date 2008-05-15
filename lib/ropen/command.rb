@@ -2,7 +2,7 @@ require "ropen"
 require "ropen/pipe"
 
 class Ropen::Command
-  attr_reader :executable, :arguments
+  attr_reader :executable, :arguments, :exit_status
   
   def initialize(executable, *arguments)
     @executable = File.expand_path(executable)
@@ -28,9 +28,8 @@ class Ropen::Command
       exit!($?.exitstatus)
     end
     stdin, stdout, stderr = open_streams(pid)
-    exit_status = $?.exitstatus
     yield stdin, stdout, stderr if block_given?
-    return exit_status
+    return @exit_status = $?
   ensure
     finalize_streams
   end

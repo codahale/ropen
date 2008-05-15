@@ -47,7 +47,8 @@ describe Ropen::Command do
     end
     
     it "should return the process' exit status" do
-      @cmd.run.should == 1
+      @cmd.run.exitstatus.should == 1
+      @cmd.exit_status.should_not be(:success)
     end
     
     it "should yield stdin, stdout, and stderr" do
