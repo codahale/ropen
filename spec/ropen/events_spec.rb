@@ -43,6 +43,7 @@ describe Ropen::Events do
     
     @events.run(@stream)
     @events.finish
+    @events.output.should == "blahblee"
     
     output.transpose.last.should == ["blah", "blah", "blee", "blee"]
   end

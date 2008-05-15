@@ -4,10 +4,11 @@ require "ropen"
 # TODO: would halting the callback chain make any sense?
 
 class Ropen::Events
-  attr_reader :callbacks
+  attr_reader :callbacks, :output
   
   def initialize
     @callbacks = []
+    @output = ""
   end
   
   def on_output(&block)
@@ -18,6 +19,7 @@ class Ropen::Events
     @thread = Thread.new do
       until stream.eof?
         data = stream.readpartial(1024)
+        @output << data
         @callbacks.each do |e|
           e.call(data)
         end
