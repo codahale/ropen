@@ -9,6 +9,7 @@ describe Ropen::Command do
     @exits_with_error  = fixture(:exits_with_error)
     @asks_for_name = fixture(:asks_for_name)
     @processes_data = fixture(:processes_data)
+    @unexecutable = fixture(:unexecutable)
   end
   
   describe "initializing" do
@@ -26,6 +27,12 @@ describe Ropen::Command do
       lambda {
         Ropen::Command.new("bleepblorp")
       }.should raise_error(Ropen::InvalidExecutableError, "bleepblorp does not exist")
+    end
+    
+    it "should raise a Ropen::InvalidExecutableError if the executable isn't executable" do
+      lambda {
+        Ropen::Command.new(@unexecutable)
+      }.should raise_error(Ropen::InvalidExecutableError, "./spec/fixtures/unexecutable.rb is not executable")
     end
     
     it "should accept a set of arguments" do

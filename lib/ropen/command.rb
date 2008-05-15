@@ -12,9 +12,7 @@ class Ropen::Command
   def initialize(executable, *arguments)
     @executable = File.expand_path(executable)
     @arguments  = arguments
-    unless File.exist?(@executable)
-      raise Ropen::InvalidExecutableError.new("#{executable} does not exist")
-    end
+    check_executable(executable)
     @stdout_events = Ropen::Events.new
     @stderr_events = Ropen::Events.new
     @stdin_spool = Ropen::Spool.new
@@ -54,6 +52,16 @@ class Ropen::Command
   end
   
 private
+  
+  def check_executable(executable)
+    unless File.exist?(@executable)
+      raise Ropen::InvalidExecutableError.new("#{executable} does not exist")
+    end
+    
+    unless File.executable?(@executable)
+      raise Ropen::InvalidExecutableError.new("#{executable} is not executable")
+    end
+  end
   
   def initialize_streams
     @stdin  = Ropen::Pipe.new
