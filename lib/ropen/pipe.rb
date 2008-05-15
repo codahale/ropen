@@ -1,5 +1,8 @@
 require "ropen"
 
+# TODO: add events
+# TODO: add reading/writing
+
 class Ropen::Pipe
   attr_reader :reader, :writer
   
