@@ -8,7 +8,6 @@ class Ropen::Events
   
   def initialize
     @callbacks = []
-    @running_callbacks = []
   end
   
   def on_output(&block)
@@ -20,7 +19,7 @@ class Ropen::Events
       until stream.eof?
         data = stream.readpartial(1024)
         @callbacks.each do |e|
-          @running_callbacks << Thread.new(data, &e)
+          e.call(data)
         end
       end
     end
@@ -28,7 +27,6 @@ class Ropen::Events
   
   def finish
     @thread.join
-    @running_callbacks.each { |t| t.join }
   end
   
 end
