@@ -6,10 +6,13 @@ describe Ropen::Command do
   
   before(:each) do
     @prints_stdout = fixture(:prints_stdout)
-    @full_prints_stdout = File.expand_path(@prints_stdout)
+    @exits_with_error  = fixture(:exits_with_error)
   end
   
   describe "initializing" do
+    before(:each) do
+      @full_prints_stdout = File.expand_path(@prints_stdout)
+    end
     
     it "should expand the path of the given executable" do
       File.should_receive(:expand_path).with(@prints_stdout).and_return(@full_prints_stdout)
@@ -35,6 +38,25 @@ describe Ropen::Command do
       end
       args.should == ["--color", "fleagle"]
     end
+  end
+  
+  describe "running a simple executable" do
+    
+    before(:each) do
+      @cmd = Ropen::Command.new(@exits_with_error)
+    end
+    
+    it "should return the process' exit status" do
+      @cmd.run.should == 1
+    end
+    
+    it "should yield stdin, stdout, and stderr" do
+      @cmd.run do |stdin, stdout, stderr|
+        stdout.read.chomp.should == "This is stdout."
+        stderr.read.chomp.should == "This is stderr."
+      end
+    end
     
   end
+  
 end
