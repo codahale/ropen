@@ -1,6 +1,6 @@
 # TODO: document me
 
 module Ropen
-  class InvalidExecutable < StandardError
-  end
+  class InvalidExecutableError < StandardError; end
+  class TimeoutError < StandardError; end
 end

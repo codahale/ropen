@@ -21,10 +21,10 @@ describe Ropen::Command do
       cmd.executable.should == @full_prints_stdout
     end
     
-    it "should raise a Ropen::InvalidExecutable if the executable doesn't exist" do
+    it "should raise a Ropen::InvalidExecutableError if the executable doesn't exist" do
       lambda {
         Ropen::Command.new("bleepblorp")
-      }.should raise_error(Ropen::InvalidExecutable, "bleepblorp does not exist")
+      }.should raise_error(Ropen::InvalidExecutableError, "bleepblorp does not exist")
     end
     
     it "should accept a set of arguments" do
@@ -83,9 +83,9 @@ describe Ropen::Command do
       @cmd.run
     end
     
-    it "should timeout after a specified period of waiting for input" do
-      
-    end
+#    it "should timeout after a specified period of waiting for input" do
+#      lambda { @cmd.run }.should raise_error(Ropen::TimeoutError)
+#    end
     
   end
   

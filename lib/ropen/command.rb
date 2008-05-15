@@ -11,7 +11,7 @@ class Ropen::Command
     @executable = File.expand_path(executable)
     @arguments  = arguments
     unless File.exist?(@executable)
-      raise Ropen::InvalidExecutable.new("#{executable} does not exist")
+      raise Ropen::InvalidExecutableError.new("#{executable} does not exist")
     end
     @stdout_events = Ropen::Events.new
     @stderr_events = Ropen::Events.new
