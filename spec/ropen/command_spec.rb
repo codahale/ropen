@@ -83,9 +83,10 @@ describe Ropen::Command do
       @cmd.run
     end
     
-#    it "should timeout after a specified period of waiting for input" do
+    it "should timeout after a specified period of waiting for input" do
+      pending("timeout support")
 #      lambda { @cmd.run }.should raise_error(Ropen::TimeoutError)
-#    end
+    end
     
   end
   
