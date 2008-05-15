@@ -8,6 +8,7 @@ describe Ropen::Command do
     @prints_stdout = fixture(:prints_stdout)
     @exits_with_error  = fixture(:exits_with_error)
     @asks_for_name = fixture(:asks_for_name)
+    @processes_data = fixture(:processes_data)
   end
   
   describe "initializing" do
@@ -64,7 +65,7 @@ describe Ropen::Command do
     
   end
   
-  describe "running an executable which requires input" do
+  describe "running an executable which requires input in response to something" do
     
     before(:each) do
       @cmd = Ropen::Command.new(@asks_for_name)
@@ -86,6 +87,36 @@ describe Ropen::Command do
     it "should timeout after a specified period of waiting for input" do
       pending("timeout support")
 #      lambda { @cmd.run }.should raise_error(Ropen::TimeoutError)
+    end
+    
+  end
+  
+  describe "running an execuable which requires input first" do
+    
+    before(:each) do
+      @cmd = Ropen::Command.new(@processes_data)
+    end
+    
+    it "should write input to the app before any output is recorded" do
+      stdout_lines = ""
+      @cmd.stdout.on_output do |line|
+        stdout_lines << line
+      end
+      
+      stderr_lines = ""
+      @cmd.stderr.on_output do |line|
+        stderr_lines << line
+      end
+      
+      @cmd.stdin.puts "test1"
+      @cmd.stdin.puts "test2"
+      @cmd.stdin.puts "test3"
+      @cmd.stdin.close
+      
+      @cmd.run.exitstatus.should == 2
+      
+      stdout_lines.split("\n").should == ["TEST1", "TEST2", "TEST3"]
+      stderr_lines.split("\n").should == ["Input: \"test1\\n\"", "Input: \"test2\\n\"", "Input: \"test3\\n\""]
     end
     
   end

@@ -1,6 +1,7 @@
 require "ropen"
-require "ropen/pipe"
 require "ropen/events"
+require "ropen/pipe"
+require "ropen/spool"
 
 # TODO: document me
 
@@ -15,6 +16,7 @@ class Ropen::Command
     end
     @stdout_events = Ropen::Events.new
     @stderr_events = Ropen::Events.new
+    @stdin_spool = Ropen::Spool.new
     yield self if block_given?
   end
   
@@ -30,6 +32,7 @@ class Ropen::Command
     @stdin_io = stdin
     @stdout_events.run(stdout)
     @stderr_events.run(stderr)
+    @stdin_spool.replay(stdin)
     [@stdout_events, @stderr_events].each { |e| e.finish }
     Process.waitpid(pid)
     return @exit_status = $?
@@ -38,7 +41,7 @@ class Ropen::Command
   end
   
   def stdin
-    @stdin_io
+    @stdin_io || @stdin_spool
   end
   
   def stdout
