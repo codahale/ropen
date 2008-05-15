@@ -21,24 +21,17 @@ class Ropen::Command
   def run
     initialize_streams
     pid = fork do
-      # child
-      sub_pid = fork do
-        # grandchild
-        @stdin.bind_input(STDIN)
-        @stdout.bind_output(STDOUT)
-        @stderr.bind_output(STDERR)
-	exec(@executable, *@arguments)
-      end
-      # TODO: figure out how to pass sub_pid upstream to the grandparent process
-      exit(0)
-#      Process.waitpid(sub_pid)
-#      exit($?.exitstatus)
+      @stdin.bind_input(STDIN)
+      @stdout.bind_output(STDOUT)
+      @stderr.bind_output(STDERR)
+      exec(@executable, *@arguments)
     end
     stdin, stdout, stderr = open_streams(pid)
     @stdin_io = stdin
     @stdout_events.run(stdout)
     @stderr_events.run(stderr)
     [@stdout_events, @stderr_events].each { |e| e.finish }
+    Process.waitpid(pid)
     return @exit_status = $?
   ensure
     finalize_streams
@@ -68,7 +61,7 @@ private
     @stdin.close_reader
     @stdout.close_writer
     @stderr.close_writer
-    Process.waitpid(pid)
+#    Process.waitpid(pid)
     @stdin.writer.sync = true
     return [@stdin.writer, @stdout.reader, @stderr.reader]
   end
