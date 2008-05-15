@@ -1,7 +1,6 @@
 require "ropen"
 
 # TODO: document me
-# TODO: add writing (e.g., cmd.stdin.puts)
 
 class Ropen::Pipe
   attr_reader :reader, :writer

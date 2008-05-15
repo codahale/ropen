@@ -4,6 +4,7 @@ require "ropen/pipe"
 require "ropen/spool"
 
 # TODO: document me
+# TODO: add timeouts for processes stalling for lack of stdin
 
 class Ropen::Command
   attr_reader :executable, :arguments, :exit_status
