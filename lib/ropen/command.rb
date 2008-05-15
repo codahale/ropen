@@ -22,19 +22,12 @@ class Ropen::Command
   def run
     initialize_streams
     pid = fork do
-      @stdin.bind_input(STDIN)
-      @stdout.bind_output(STDOUT)
-      @stderr.bind_output(STDERR)
+      redirect_streams
       exec(@executable, *@arguments)
     end
-    stdin, stdout, stderr = open_streams(pid)
-    @stdin_io = stdin
-    @stdout_events.run(stdout)
-    @stderr_events.run(stderr)
-    @stdin_spool.replay(stdin)
-    [@stdout_events, @stderr_events].each { |e| e.finish }
-    Process.waitpid(pid)
-    return @exit_status = $?
+    stdin, stdout, stderr = open_streams
+    process_streams(stdin, stdout, stderr, pid)
+    return @exit_status
   ensure
     finalize_streams
   end
@@ -53,29 +46,34 @@ class Ropen::Command
   
 private
   
-  def check_executable(executable)
-    unless File.exist?(@executable)
-      raise Ropen::InvalidExecutableError.new("#{executable} does not exist")
-    end
-    
-    unless File.executable?(@executable)
-      raise Ropen::InvalidExecutableError.new("#{executable} is not executable")
-    end
-  end
-  
   def initialize_streams
     @stdin  = Ropen::Pipe.new
     @stdout = Ropen::Pipe.new
     @stderr = Ropen::Pipe.new
   end
   
-  def open_streams(pid)
+  def open_streams
     @stdin.close_reader
     @stdout.close_writer
     @stderr.close_writer
-#    Process.waitpid(pid)
     @stdin.writer.sync = true
     return [@stdin.writer, @stdout.reader, @stderr.reader]
+  end
+  
+  def redirect_streams
+    @stdin.bind_input(STDIN)
+    @stdout.bind_output(STDOUT)
+    @stderr.bind_output(STDERR)
+  end
+  
+  def process_streams(stdin, stdout, stderr, child_pid)
+    @stdin_io = stdin
+    @stdout_events.run(stdout)
+    @stderr_events.run(stderr)
+    @stdin_spool.replay(stdin)
+    [@stdout_events, @stderr_events].each { |e| e.finish }
+    Process.waitpid(child_pid)
+    @exit_status = $?
   end
   
   def finalize_streams
@@ -86,4 +84,14 @@ private
     @stderr = nil
   end
   
+  def check_executable(executable_name)
+    unless File.exist?(@executable)
+      raise Ropen::InvalidExecutableError.new("#{executable_name} does not exist")
+    end
+    
+    unless File.executable?(@executable)
+      raise Ropen::InvalidExecutableError.new("#{executable_name} is not executable")
+    end
+  end
+
 end
