@@ -1,6 +1,7 @@
 require "ropen"
 
 # TODO: document me
+# TODO: would halting the callback chain make any sense?
 
 class Ropen::Events
   attr_reader :callbacks
