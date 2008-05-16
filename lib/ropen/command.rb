@@ -28,7 +28,7 @@ class Ropen::Command
   # <tt>Ropen::InvalidExecutableError</tt> exception will be raised.
   # 
   # @param [String] executable the filename of the executable to run
-  # @param [Array] optional arguments to be passed to the executable
+  # @param [Array] arguments optional arguments to be passed to the executable
   # @return [Ropen::Command] a command instance
   # @yield passes itself to an option block for convenient configuration
   # @raise Ropen::InvalidExecutableError raised when +executable+ is invalid
