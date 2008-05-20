@@ -19,11 +19,11 @@ describe Ropen::Events::EventHandler do
   end
   
   it "should run events on the output of a stream" do
-    @event.should_receive(:start).ordered
+    @event.should_receive(:start).with(@command).ordered
     @event.should_receive(:stdout).with(@command, "blah").ordered
     @event.should_receive(:stdout).with(@command, "blee").ordered
     @event.should_receive(:stderr).with(@command, "ERROR").ordered
-    @event.should_receive(:finish).ordered
+    @event.should_receive(:finish).with(@command).ordered
     
     @stdout.should_receive(:eof?).and_return(false, false, true)
     @stdout.should_receive(:readpartial).with(an_instance_of(Numeric)).and_return("blah", "blee")

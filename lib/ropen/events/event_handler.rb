@@ -16,7 +16,7 @@ class Ropen::Events::EventHandler
   end
   
   def run(stdout, stderr)
-    call_events(:start)
+    call_events(:start, @command)
     handle_output(stdout, :stdout)
     handle_output(stderr, :stderr)
   end
@@ -24,7 +24,7 @@ class Ropen::Events::EventHandler
   # Blocks until the threads started by #run completes.
   def finish
     @threads.each { |t| t.join }
-    call_events(:finish)
+    call_events(:finish, @command)
     @threads.clear
   end
   
