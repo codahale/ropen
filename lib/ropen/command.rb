@@ -1,5 +1,6 @@
 require "ropen"
-require "ropen/events"
+require "ropen/events/event_builder"
+require "ropen/events/event_handler"
 require "ropen/pipe"
 require "ropen/spool"
 
@@ -35,9 +36,9 @@ class Ropen::Command
   def initialize(executable, *arguments)
     @executable = find_executable(executable)
     @arguments  = arguments
-    @stdout_events = Ropen::Events.new
-    @stderr_events = Ropen::Events.new
     @stdin_spool = Ropen::Spool.new
+    @event_handler = Ropen::Events::EventHandler.new(self)
+    @event_builder = Ropen::Events::EventBuilder.new(@event_handler)
     yield self if block_given?
   end
   
@@ -67,19 +68,17 @@ class Ropen::Command
     @stdin_io || @stdin_spool
   end
   
-  # An event builder for STDOUT output.
-  # 
-  # @return [Ropen::Events] event builder for STDOUT output
-  def stdout
-    @stdout_events
+  # TODO: document me
+  def on_stdout(&block)
+    @event_builder.on_stdout(&block)
   end
   
-  # An event builder for STDERR output.
-  # 
-  # @return [Ropen::Events] event bulder for STDERR output.
-  def stderr
-    @stderr_events
+  # TODO: document me
+  def on_stderr(&block)
+    @event_builder.on_stderr(&block)
   end
+  
+  # TODO: add #on_start, #on_stop
   
 private
   
@@ -115,10 +114,9 @@ private
   # the child process terminates, at which point its exit status is saved.
   def process_streams(stdin, stdout, stderr, child_pid)
     @stdin_io = stdin
-    @stdout_events.run(stdout)
-    @stderr_events.run(stderr)
+    @event_handler.run(stdout, stderr)
     @stdin_spool.replay(stdin)
-    [@stdout_events, @stderr_events].each { |e| e.finish }
+    @event_handler.finish
     Process.waitpid(child_pid)
     @exit_status = $?
   end
