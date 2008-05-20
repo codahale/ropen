@@ -2,7 +2,7 @@ require "ropen/events"
 
 # TODO: document me
 
-class Ropen::Events::EventsHandler
+class Ropen::Events::EventHandler
   attr_reader :events
   
   def initialize(command)
