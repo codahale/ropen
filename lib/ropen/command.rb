@@ -69,6 +69,11 @@ class Ropen::Command
   end
   
   # TODO: document me
+  def events
+    @event_handler.events
+  end
+  
+  # TODO: document me
   def register_event(event)
     @event_handler.register(event)
   end
@@ -83,7 +88,15 @@ class Ropen::Command
     @event_builder.on_stderr(&block)
   end
   
-  # TODO: add #on_start, #on_stop
+  # TODO: document me
+  def on_start(&block)
+    @event_builder.on_start(&block)
+  end
+  
+  # TODO: document me
+  def on_finish(&block)
+    @event_builder.on_finish(&block)
+  end
   
 private
   
@@ -121,9 +134,9 @@ private
     @stdin_io = stdin
     @event_handler.run(stdout, stderr)
     @stdin_spool.replay(stdin)
-    @event_handler.finish
     Process.waitpid(child_pid)
     @exit_status = $?
+    @event_handler.finish
   end
   
   # Closes any open streams, and removes the references to avoid broken pipe

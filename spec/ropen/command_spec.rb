@@ -122,10 +122,17 @@ describe Ropen::Command do
         stderr_lines << line
       end
       
-      @cmd.stdin.puts "test1"
+      @cmd.on_start do |cmd|
+        cmd.stdin.puts "test1"
+      end
+      
       @cmd.stdin.puts "test2"
       @cmd.stdin.puts "test3"
       @cmd.stdin.close
+      
+      @cmd.on_finish do |cmd|
+        cmd.exit_status.exitstatus.should == 2
+      end
       
       @cmd.run.exitstatus.should == 2
       
@@ -133,6 +140,35 @@ describe Ropen::Command do
       stderr_lines.split("\n").should == ["Input: \"test1\\n\"", "Input: \"test2\\n\"", "Input: \"test3\\n\""]
     end
     
+  end
+  
+  describe "running an executable via an event class" do
+    
+    class ProcessingData < Ropen::Events::AbstractEvent
+      def start(cmd)
+	cmd.stdin.puts("yay")
+        cmd.stdin.close
+      end
+      
+      def stdout(cmd, data)
+	data.should == "YAY\n"
+      end
+    end
+    
+    before(:each) do
+      @event = ProcessingData.new
+      @cmd = Ropen::Command.new(@processes_data)
+    end
+    
+    it "should register the event" do
+      @cmd.register_event(@event)
+      @cmd.events.should include(@event)
+    end
+    
+    it "should run the executable and pass callbacks to the event" do
+      @cmd.register_event(@event)
+      @cmd.run
+    end
   end
   
 end
