@@ -15,7 +15,6 @@ describe Ropen::Command do
   describe "initializing" do
     
     before(:each) do
-      pending("full events implementation")
       @full_prints_stdout = File.expand_path(@prints_stdout)
     end
     
@@ -54,7 +53,6 @@ describe Ropen::Command do
   describe "running a simple executable" do
     
     before(:each) do
-      pending("full events implementation")
       @cmd = Ropen::Command.new(@exits_with_error)
     end
     
@@ -64,10 +62,12 @@ describe Ropen::Command do
     end
     
     it "should call events placed on output streams" do
-      @cmd.stdout.on_output do |line|
+      @cmd.on_stdout do |cmd, line|
+        cmd.should == @cmd
         line.should == "This is stdout.\n"
       end
-      @cmd.stderr.on_output do |line|
+      @cmd.on_stderr do |cmd, line|
+        cmd.should == @cmd
         line.should == "This is stderr.\n"
       end
       @cmd.run
@@ -78,18 +78,19 @@ describe Ropen::Command do
   describe "running an executable which requires input in response to something" do
     
     before(:each) do
-      pending("full events implementation")
       @cmd = Ropen::Command.new(@asks_for_name)
     end
     
     it "should allow data to be written on stdin" do
-      @cmd.stdout.on_output do |line|
+      @cmd.on_stdout do |cmd, line|
+        cmd.should == @cmd
         line.should == "You entered: MONGO\n"
       end
-      @cmd.stderr.on_output do |line|
+      @cmd.on_stderr do |cmd, line|
+        cmd.should == @cmd
         if line =~ /Enter your name/
-          @cmd.stdin.puts "MONGO"
-          @cmd.stdin.flush
+          cmd.stdin.puts "MONGO"
+          cmd.stdin.flush
         end
       end
       @cmd.run
@@ -105,18 +106,19 @@ describe Ropen::Command do
   describe "running an execuable which requires input first" do
     
     before(:each) do
-      pending("full events implementation")
       @cmd = Ropen::Command.new(@processes_data)
     end
     
     it "should write input to the app before any output is recorded" do
       stdout_lines = ""
-      @cmd.stdout.on_output do |line|
+      @cmd.on_stdout do |cmd, line|
+        cmd.should == @cmd
         stdout_lines << line
       end
       
       stderr_lines = ""
-      @cmd.stderr.on_output do |line|
+      @cmd.on_stderr do |cmd, line|
+        cmd.should == @cmd
         stderr_lines << line
       end
       
