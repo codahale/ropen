@@ -13,44 +13,44 @@ describe Ropen::Events::BlockEvent do
     @cmd.should_receive(:stdin).and_return(@cmd)
     @cmd.should_receive(:puts).with("dingo")
     @event.on_start = lambda { |cmd| cmd.stdin.puts("dingo") }
-    @event.start(@cmd).should_not be(false)
+    lambda { @event.start(@cmd) }.should_not throw_symbol(:halt)
   end
   
-  it "should not return false when started without an on_start block" do
-    @event.start(@cmd).should_not be(false)
+  it "should not halt when started without an on_start block" do
+    lambda { @event.start(@cmd) }.should_not throw_symbol(:halt)
   end
   
   it "should call its on_stop block when stopped" do
     @cmd.should_receive(:stdin).and_return(@cmd)
     @cmd.should_receive(:puts).with("dingo")
     @event.on_finish = lambda { |cmd| cmd.stdin.puts("dingo") }
-    @event.finish(@cmd).should_not be(false)
+    lambda { @event.finish(@cmd) }.should_not throw_symbol(:halt)
   end
   
-  it "should not return false when stopped without an on_stop block" do
-    @event.finish(@cmd).should_not be(false)
+  it "should not halt when stopped without an on_stop block" do
+    lambda { @event.finish(@cmd) }.should_not throw_symbol(:halt)
   end
   
   it "should call its on_stdout block when given stdout output" do
     @cmd.should_receive(:stdin).and_return(@cmd)
     @cmd.should_receive(:puts).with(@data)
     @event.on_stdout = lambda { |cmd, data| cmd.stdin.puts(data) }
-    @event.stdout(@cmd, @data).should_not be(false)
+    lambda { @event.stdout(@cmd, @data) }.should_not throw_symbol(:halt)
   end
   
-  it "should not return false when given stdout output without an on_stdout block" do
-    @event.stdout(@cmd, @data).should_not be(false)
+  it "should not halt when given stdout output without an on_stdout block" do
+    lambda { @event.stdout(@cmd, @data) }.should_not throw_symbol(:halt)
   end
   
   it "should call its on_stderr block when given stderr output" do
     @cmd.should_receive(:stdin).and_return(@cmd)
     @cmd.should_receive(:puts).with(@data)
     @event.on_stderr = lambda { |cmd, data| cmd.stdin.puts(data) }
-    @event.stderr(@cmd, @data).should_not be(false)
+    lambda { @event.stderr(@cmd, @data) }.should_not throw_symbol(:halt)
   end
   
-  it "should not return false when given stderr output without an on_stderr block" do
-    @event.stderr(@cmd, @data).should_not be(false)
+  it "should not halt when given stderr output without an on_stderr block" do
+    lambda { @event.stderr(@cmd, @data) }.should_not throw_symbol(:halt)
   end
   
 end

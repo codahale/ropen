@@ -29,7 +29,7 @@ class Ropen::Events::BlockEvent < Ropen::Events::AbstractEvent
 private
   
   def empty_event(*_)
-    return true
+    # do nothing
   end
   
 end
