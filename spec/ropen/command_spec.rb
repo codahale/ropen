@@ -82,10 +82,13 @@ describe Ropen::Command do
     end
     
     it "should allow data to be written on stdin" do
+      stdout_lines = ""
+      
       @cmd.on_stdout do |cmd, line|
         cmd.should == @cmd
-        line.should == "You entered: MONGO\n"
+        stdout_lines << line
       end
+      
       @cmd.on_stderr do |cmd, line|
         cmd.should == @cmd
         if line =~ /Enter your name/
@@ -93,7 +96,10 @@ describe Ropen::Command do
           cmd.stdin.flush
         end
       end
+      
       @cmd.run
+      
+      stdout_lines.split("\n").should include("You entered: MONGO")
     end
     
     it "should timeout after a specified period of waiting for input" do
