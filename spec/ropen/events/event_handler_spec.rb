@@ -1,15 +1,15 @@
 require File.join(File.dirname(__FILE__), "..", "..", "spec_helper")
 
-require "ropen/events/events_handler"
+require "ropen/events/event_handler"
 
-describe Ropen::Events::EventsHandler do
+describe Ropen::Events::EventHandler do
   
   before(:each) do
     @stdout = mock(:stdout)
     @stderr = mock(:stderr)
     @command = mock(:event)
     @event = mock(:event)
-    @handler = Ropen::Events::EventsHandler.new(@command)
+    @handler = Ropen::Events::EventHandler.new(@command)
   end
   
   it "should register events" do
