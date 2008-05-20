@@ -23,12 +23,12 @@ describe Ropen::Events::BlockEvent do
   it "should call its on_stop block when stopped" do
     @cmd.should_receive(:stdin).and_return(@cmd)
     @cmd.should_receive(:puts).with("dingo")
-    @event.on_stop = lambda { |cmd| cmd.stdin.puts("dingo") }
-    @event.stop(@cmd).should_not be(false)
+    @event.on_finish = lambda { |cmd| cmd.stdin.puts("dingo") }
+    @event.finish(@cmd).should_not be(false)
   end
   
   it "should not return false when stopped without an on_stop block" do
-    @event.stop(@cmd).should_not be(false)
+    @event.finish(@cmd).should_not be(false)
   end
   
   it "should call its on_stdout block when given stdout output" do
