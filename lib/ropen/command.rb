@@ -69,6 +69,11 @@ class Ropen::Command
   end
   
   # TODO: document me
+  def register_event(event)
+    @event_handler.register(event)
+  end
+  
+  # TODO: document me
   def on_stdout(&block)
     @event_builder.on_stdout(&block)
   end
