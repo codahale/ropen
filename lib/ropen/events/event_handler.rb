@@ -17,15 +17,25 @@ class Ropen::Events::EventHandler
   
   def run(stdout, stderr)
     call_events(:start, @command)
-    handle_output(stdout, :stdout)
-    handle_output(stderr, :stderr)
+    def stdout.callback ; :stdout ; end
+    def stderr.callback ; :stderr ; end
+    streams = [stdout, stderr]
+    until streams.empty?
+      selected, _ = IO.select(streams, nil, nil, 0.1)
+      next if selected.nil? || selected.empty?
+      selected.each do |stream|
+        if stream.eof? then
+          streams.delete(stream)
+        else
+          data = stream.readpartial(1024)
+          call_events(stream.callback, @command, data)
+        end
+      end
+    end
   end
   
-  # Blocks until the threads started by #run completes.
   def finish
-    @threads.each { |t| t.join }
     call_events(:finish, @command)
-    @threads.clear
   end
   
 private
@@ -34,17 +44,6 @@ private
     catch(:halt) do
       @events.each { |e| e.send(m, *args) }
     end
-  end
-  
-  def handle_output(stream, callback_method)
-    thread = Thread.new do
-      until stream.eof?
-        data = stream.readpartial(1024) # TODO: smaller buffer?
-        call_events(callback_method, @command, data)
-      end
-    end
-    thread.abort_on_exception = true
-    @threads << thread
   end
   
 end

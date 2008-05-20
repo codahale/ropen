@@ -4,6 +4,7 @@ require "spec"
 
 Spec::Runner.configure do |config|
   def fixture(name)
-    File.join(".", "spec", "fixtures", "#{name}.rb")
+    filename = name.is_a?(Symbol) ? "#{name}.rb" : name
+    File.join(".", "spec", "fixtures", filename)
   end
 end
