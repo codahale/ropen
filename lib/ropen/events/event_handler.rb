@@ -37,12 +37,14 @@ private
   end
   
   def handle_output(stream, callback_method)
-    @threads << Thread.new do
+    thread = Thread.new do
       until stream.eof?
         data = stream.readpartial(1024) # TODO: smaller buffer?
         call_events(callback_method, @command, data)
       end
     end
+    thread.abort_on_exception = true
+    @threads << thread
   end
   
 end
