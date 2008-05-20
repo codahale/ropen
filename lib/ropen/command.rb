@@ -68,32 +68,45 @@ class Ropen::Command
     @stdin_io || @stdin_spool
   end
   
-  # TODO: document me
+  # A list of registered events which will receive callbacks when this command
+  # runs.
+  # 
+  # @return [Array] an array of events
   def events
     @event_handler.events
   end
   
-  # TODO: document me
+  # Adds +event+ to the end of the list of registered events.
+  # 
+  # @param event The event to add.
   def register_event(event)
     @event_handler.register(event)
   end
   
-  # TODO: document me
+  # Runs a block when the child process writes to +STDOUT+.
+  # 
+  # @yield [Ropen::Command, String] The command being run and the data written.
   def on_stdout(&block)
     @event_builder.on_stdout(&block)
   end
   
-  # TODO: document me
+  # Runs a block when the child process writes to +STDERR+.
+  # 
+  # @yield [Ropen::Command, String] The command being run and the data written.
   def on_stderr(&block)
     @event_builder.on_stderr(&block)
   end
   
-  # TODO: document me
+  # Runs a block when the child process starts.
+  # 
+  # @yield [Ropen::Command] The command being run.
   def on_start(&block)
     @event_builder.on_start(&block)
   end
   
-  # TODO: document me
+  # Runs a block when the child process terminates.
+  # 
+  # @yield [Ropen::Command] The command that was run.
   def on_finish(&block)
     @event_builder.on_finish(&block)
   end
