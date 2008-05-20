@@ -9,19 +9,19 @@ describe Ropen::Events::AbstractEvent do
   end
   
   it "should do nothing on starting" do
-    @event.start(@cmd).should == true
+    lambda { @event.start(@cmd) }.should_not throw_symbol(:halt)
   end
   
   it "should do nothing on finishing" do
-    @event.finish(@cmd).should == true
+    lambda { @event.finish(@cmd) }.should_not throw_symbol(:halt)
   end
   
   it "should do nothing on stdout output" do
-    @event.stdout(@cmd, @data).should == true
+    lambda { @event.stdout(@cmd, @data) }.should_not throw_symbol(:halt)
   end
   
   it "should do nothing on stderr output" do
-    @event.stderr(@cmd, @data).should == true
+    lambda { @event.stderr(@cmd, @data) }.should_not throw_symbol(:halt)
   end
   
 end
