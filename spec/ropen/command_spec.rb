@@ -123,12 +123,13 @@ describe Ropen::Command do
       end
       
       @cmd.on_start do |cmd|
-        cmd.stdin.puts "test1"
+        cmd.stdin.puts "test3"
+        cmd.stdin.close
       end
       
+      @cmd.stdin.puts "test1"
       @cmd.stdin.puts "test2"
-      @cmd.stdin.puts "test3"
-      @cmd.stdin.close
+      
       
       @cmd.on_finish do |cmd|
         cmd.exit_status.exitstatus.should == 2

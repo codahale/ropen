@@ -145,8 +145,8 @@ private
   # the child process terminates, at which point its exit status is saved.
   def process_streams(stdin, stdout, stderr, child_pid)
     @stdin_io = stdin
-    @event_handler.run(stdout, stderr)
     @stdin_spool.replay(stdin)
+    @event_handler.run(stdout, stderr)
     Process.waitpid(child_pid)
     @exit_status = $?
     @event_handler.finish
