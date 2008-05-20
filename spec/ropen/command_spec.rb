@@ -13,7 +13,9 @@ describe Ropen::Command do
   end
   
   describe "initializing" do
+    
     before(:each) do
+      pending("full events implementation")
       @full_prints_stdout = File.expand_path(@prints_stdout)
     end
     
@@ -52,6 +54,7 @@ describe Ropen::Command do
   describe "running a simple executable" do
     
     before(:each) do
+      pending("full events implementation")
       @cmd = Ropen::Command.new(@exits_with_error)
     end
     
@@ -75,6 +78,7 @@ describe Ropen::Command do
   describe "running an executable which requires input in response to something" do
     
     before(:each) do
+      pending("full events implementation")
       @cmd = Ropen::Command.new(@asks_for_name)
     end
     
@@ -101,6 +105,7 @@ describe Ropen::Command do
   describe "running an execuable which requires input first" do
     
     before(:each) do
+      pending("full events implementation")
       @cmd = Ropen::Command.new(@processes_data)
     end
     
