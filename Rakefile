@@ -15,6 +15,18 @@ CLOBBER.include(
   "doc/coverage"
 )
 
+STATS_DIRECTORIES = [
+  ['Code', 'lib/'],
+  ['Unit tests', 'spec']
+].collect { |name, dir| [ name, "./#{dir}" ] }.
+  select  { |name, dir| File.directory?(dir) }
+
+desc "Report code statistics (KLOCs, etc) from the application"
+task :stats do
+  require File.join(File.dirname(__FILE__), "tools", "code_statistics")
+  CodeStatistics.new(*STATS_DIRECTORIES).to_s
+end
+
 namespace :spec do
   desc "Run all specs and store html output in doc/specs.html"
   Spec::Rake::SpecTask.new('html') do |t|
